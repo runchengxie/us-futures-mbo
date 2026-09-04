@@ -29,7 +29,7 @@ def quote_cost(config: QuoteConfig, gateway: Any) -> dict[str, Any]:
     raw = _as_mapping(gateway.get_cost(**request))
     return {
         "request": request,
-        "cost_usd": _first(raw, "cost", "cost_usd", "price"),
+        "cost_usd": _first(raw, "cost", "cost_usd", "price", "value"),
         "billable_size_bytes": _first(raw, "billable_size", "billable_size_bytes", "size"),
         "raw_summary": raw,
     }

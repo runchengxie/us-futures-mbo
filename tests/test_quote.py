@@ -20,3 +20,12 @@ def test_quote_passes_config_and_normalizes_cost():
     assert result["cost_usd"] == 12.34
     assert result["billable_size_bytes"] == 987654
     assert "api_key" not in result
+
+
+def test_quote_accepts_databento_value_response():
+    class ValueGateway:
+        def get_cost(self, **kwargs):
+            return {"value": 4783.616625089943}
+
+    result = quote_cost(QuoteConfig.from_mapping({}), ValueGateway())
+    assert result["cost_usd"] == 4783.616625089943
