@@ -30,7 +30,7 @@ class QuoteConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     dataset: str = DEFAULTS["dataset"]
-    schema: str = DEFAULTS["schema"]
+    schema_: str = Field(default=DEFAULTS["schema"], alias="schema")
     symbols: list[str] = Field(default_factory=lambda: list(DEFAULTS["symbols"]))
     stype_in: str = DEFAULTS["stype_in"]
     start: datetime = DEFAULTS["start"]
@@ -41,12 +41,16 @@ class QuoteConfig(BaseModel):
     def normalize_datetime(cls, value: datetime | str) -> datetime:
         return _as_utc(value)
 
-    @field_validator("schema")
+    @field_validator("schema_")
     @classmethod
     def validate_schema(cls, value: str) -> str:
         if value != "mbo":
             raise ValueError("schema must be mbo")
         return value
+
+    @property
+    def schema(self) -> str:
+        return self.schema_
 
     @field_validator("symbols")
     @classmethod
