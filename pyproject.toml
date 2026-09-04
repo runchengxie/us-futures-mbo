@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "us-futures-mbo"
+version = "0.1.0"
+description = "Safe Databento quote and bounded exploration tools for NQ/MNQ MBO data"
+requires-python = ">=3.11"
+dependencies = [
+  "databento>=0.48",
+  "pydantic>=2.0",
+  "PyYAML>=6.0",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+nq-mnq-mbo = "us_futures_mbo.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
