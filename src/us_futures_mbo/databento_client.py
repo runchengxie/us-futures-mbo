@@ -26,3 +26,7 @@ class DatabentoGateway:
         )
         record_count = self._client.metadata.get_record_count(**request_kwargs)
         return {"fields": fields, "record_count": record_count}
+
+    def download(self, **request_kwargs: Any) -> Any:
+        path = request_kwargs.pop("path")
+        return self._client.timeseries.get_range(path=path, **request_kwargs)

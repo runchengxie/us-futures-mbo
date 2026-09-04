@@ -37,6 +37,19 @@ uv run python -m us_futures_mbo.cli explore `
 
 探索使用 Databento metadata 接口获取字段和记录数摘要，`raw_data_downloaded` 应为 `false`。如果要扩大窗口，必须显式加入 `--allow-large-window`。
 
+## 带缓存的下载
+
+下载命令要求显式提供时间范围。它会生成稳定 cache key，跳过已通过 DBN metadata 校验的文件，失败时使用 `.part` 文件，成功后写入 manifest 和 SHA-256：
+
+```powershell
+uv run python -m us_futures_mbo.cli download `
+  --config config/quote.yaml `
+  --start 2026-09-02T00:00:00Z `
+  --end 2026-09-02T20:00:00Z
+```
+
+原始 DBN 文件按 `data/raw/...` 保存，manifest 在 `data/manifest/`。后续如需大量列筛选，可从 raw DBN 派生 Parquet；不要对 raw MBO 记录去重或重新排序，必须保留 `sequence` 顺序。
+
 ## 口径提醒
 
 - NQ 是 E-mini Nasdaq-100 期货，MNQ 是 Micro E-mini Nasdaq-100 期货；合约乘数不同，但 MBO 数据量取决于订单事件，不取决于合约乘数。

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from .cache import download_dbn
 from .config import QuoteConfig
 from .databento_client import DatabentoGateway
 from .explore import explore_window
@@ -26,6 +27,12 @@ def build_parser() -> argparse.ArgumentParser:
     explore.add_argument("--start")
     explore.add_argument("--end")
     explore.add_argument("--allow-large-window", action="store_true")
+
+    download = subparsers.add_parser("download", help="download one validated DBN cache object")
+    download.add_argument("--config", type=Path, default=Path("config/quote.yaml"))
+    download.add_argument("--start", required=True)
+    download.add_argument("--end", required=True)
+    download.add_argument("--output-root", type=Path, default=Path("data"))
     return parser
 
 
@@ -34,13 +41,14 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         config = QuoteConfig.from_yaml(args.config)
-        if args.command == "explore":
-            if not args.start or not args.end:
-                raise ValueError("explore requires explicit --start and --end")
+        if args.command in ("explore", "download"):
             config = QuoteConfig.from_mapping({**config.to_request_kwargs(), "start": args.start, "end": args.end})
         gateway = DatabentoGateway(os.environ.get("DATABENTO_API_KEY", ""))
         if args.command == "quote":
             result = quote_cost(config, gateway)
+        elif args.command == "download":
+            quote = quote_cost(config, gateway)
+            result = download_dbn(config, gateway.download, root=args.output_root, quote_usd=quote["cost_usd"])
         else:
             result = explore_window(config, gateway, allow_large_window=args.allow_large_window)
         print(json.dumps(result, indent=2, ensure_ascii=False, default=str))
