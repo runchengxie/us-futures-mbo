@@ -10,5 +10,6 @@ cache/
 reports/*.json
 reports/*.csv
 reports/*.dbn*
+reports/*.png
 *.parquet
 *.csv
