@@ -19,3 +19,10 @@ class DatabentoGateway:
 
     def get_cost(self, **request_kwargs: Any) -> Any:
         return self._client.metadata.get_cost(**request_kwargs)
+
+    def describe(self, **request_kwargs: Any) -> dict[str, Any]:
+        fields = self._client.metadata.list_fields(
+            schema=request_kwargs["schema"], encoding="dbn", dataset=request_kwargs["dataset"]
+        )
+        record_count = self._client.metadata.get_record_count(**request_kwargs)
+        return {"fields": fields, "record_count": record_count}
