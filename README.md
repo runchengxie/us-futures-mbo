@@ -48,7 +48,12 @@ uv run python -m us_futures_mbo.cli download `
   --end 2026-09-02T20:00:00Z
 ```
 
-原始 DBN 文件按 `data/raw/...` 保存，manifest 在 `data/manifest/`。后续如需大量列筛选，可从 raw DBN 派生 Parquet；不要对 raw MBO 记录去重或重新排序，必须保留 `sequence` 顺序。
+下载目录优先使用显式 `--output-root`，其次使用 `DATA_ROOT/us-futures-mbo`。
+launcher 可以读取明确指定的工作区 TOML，将其中 `data_root` 注入 `DATA_ROOT`；CLI 不自动查找个人配置。
+两者均未设置时仍兼容当前目录下的 `data/`，并提示配置外部目录。既有文件不会自动移动。
+继续使用旧缓存时请显式传入旧目录，避免切换根目录后重复下载。Python `download_dbn` 的默认参数保持兼容。
+原始 DBN 文件按所选根目录下的 `raw/...` 保存，manifest 在 `manifest/`。
+后续如需大量列筛选，可从 raw DBN 派生 Parquet；不要对 raw MBO 记录去重或重新排序，必须保留 `sequence` 顺序。
 
 ## 口径提醒
 

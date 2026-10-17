@@ -32,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     download.add_argument("--config", type=Path, default=Path("config/quote.yaml"))
     download.add_argument("--start", required=True)
     download.add_argument("--end", required=True)
-    download.add_argument("--output-root", type=Path, default=Path("data"))
+    download.add_argument("--output-root", type=Path, help="Output directory; defaults to DATA_ROOT/us-futures-mbo")
     return parser
 
 
@@ -40,6 +40,16 @@ def main(argv: list[str] | None = None) -> int:
     load_dotenv()
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "download" and args.output_root is None:
+            if data_root := os.environ.get("DATA_ROOT"):
+                args.output_root = Path(data_root) / "us-futures-mbo"
+            else:
+                args.output_root = Path("data")
+                print(
+                    "Deprecated default output location: set DATA_ROOT or --output-root "
+                    "to select the external data directory. Existing files are not moved.",
+                    file=sys.stderr,
+                )
         config = QuoteConfig.from_yaml(args.config)
         if args.command in ("explore", "download"):
             config = QuoteConfig.from_mapping({**config.to_request_kwargs(), "start": args.start, "end": args.end})
